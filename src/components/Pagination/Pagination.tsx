@@ -12,11 +12,13 @@ const ReactPaginate = (
 
 interface PaginationProps {
   pageCount: number
+  currentPage: number
   onPageChange: (page: number) => void
 }
 
 export default function Pagination({
   pageCount,
+  currentPage,
   onPageChange,
 }: PaginationProps) {
   const handlePageClick = (event: { selected: number }) => {
@@ -25,15 +27,24 @@ export default function Pagination({
 
   return (
     <ReactPaginate
-      pageCount={pageCount}
-      onPageChange={handlePageClick}
-      containerClassName={css.pagination}
-      activeClassName={css.active}
+      className={css.pagination}
       pageClassName={css.pageItem}
+      pageLinkClassName={css.pageLink}
       previousClassName={css.pageItem}
+      previousLinkClassName={css.pageLink}
       nextClassName={css.pageItem}
-      previousLabel="&lt;"
-      nextLabel="&gt;"
+      nextLinkClassName={css.pageLink}
+      breakClassName={css.pageItem}
+      breakLinkClassName={css.pageLink}
+      activeClassName={css.active}
+      disabledClassName={css.disabled}
+      pageCount={pageCount}
+      pageRangeDisplayed={3}
+      marginPagesDisplayed={1}
+      onPageChange={handlePageClick}
+      forcePage={currentPage - 1}
+      previousLabel="<"
+      nextLabel=">"
       breakLabel="..."
     />
   )

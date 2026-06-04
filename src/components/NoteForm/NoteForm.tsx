@@ -1,10 +1,12 @@
 import { Formik, Form, Field, ErrorMessage } from 'formik'
 import * as Yup from 'yup'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { createNote } from '../../services/noteService'
+import type { CreateNoteInput } from '../../services/noteService'
 import css from './NoteForm.module.css'
 
 interface NoteFormProps {
   onClose: () => void
-  onSubmit: (data: { title: string; content: string; tag: string }) => void
 }
 
 const validationSchema = Yup.object({
@@ -18,8 +20,22 @@ const validationSchema = Yup.object({
     .required('Tag is required'),
 })
 
-export default function NoteForm({ onClose, onSubmit }: NoteFormProps) {
-  const initialValues = {
+export default function NoteForm({ onClose }: NoteFormProps) {
+  const queryClient = useQueryClient()
+
+  // Внедряем мутацию прямо сюда
+  const { mutate, isPending } = useMutation({
+    mutationFn: (newNote: CreateNoteInput) => createNote(newNote),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['notes'] }) // Инвалидируем кэш заметок
+      onClose() // Закрываем модалку при успехе
+    },
+    onError: error => {
+      console.error('Error creating note:', error)
+    },
+  })
+
+  const initialValues: CreateNoteInput = {
     title: '',
     content: '',
     tag: 'Todo',
@@ -30,7 +46,7 @@ export default function NoteForm({ onClose, onSubmit }: NoteFormProps) {
       initialValues={initialValues}
       validationSchema={validationSchema}
       onSubmit={values => {
-        onSubmit(values)
+        mutate(values) // Вызываем мутацию вместо старого onSubmit из пропсов
       }}
     >
       {() => (
@@ -77,8 +93,12 @@ export default function NoteForm({ onClose, onSubmit }: NoteFormProps) {
             >
               Cancel
             </button>
-            <button type="submit" className={css.submitButton} disabled={false}>
-              Create note
+            <button
+              type="submit"
+              className={css.submitButton}
+              disabled={isPending}
+            >
+              {isPending ? 'Creating...' : 'Create note'}
             </button>
           </div>
         </Form>

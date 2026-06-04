@@ -31,31 +31,22 @@ export const fetchNotes = async (
       params: {
         page,
         perPage,
-        search,
+        search: search || undefined,
       },
     })
   return response.data
 }
-export const createNote = async (noteData: {
-  title: string
-  content: string
-  tag: string
-}) => {
-  const response = await axios.post(
-    'https://notehub-public.goit.study/api/notes',
-    noteData,
-    {
-      headers: {
-        Authorization: `Bearer ${import.meta.env.VITE_NOTEHUB_TOKEN}`,
-      },
-    }
-  )
+
+export async function createNote(noteData: CreateNoteInput): Promise<Note> {
+  const response: AxiosResponse<Note> = await api.post<
+    Note,
+    AxiosResponse<Note>,
+    CreateNoteInput
+  >('/notes', noteData)
   return response.data
 }
-export const deleteNote = async (id: string): Promise<void> => {
-  await axios.delete(`https://notehub-public.goit.study/api/notes/${id}`, {
-    headers: {
-      Authorization: `Bearer ${import.meta.env.VITE_NOTEHUB_TOKEN}`,
-    },
-  })
+export async function deleteNote(id: string): Promise<Note> {
+  const response: AxiosResponse<Note> = await api.delete<Note>(`/notes/${id}`)
+
+  return response.data
 }
