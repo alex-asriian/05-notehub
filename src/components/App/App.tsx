@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import NoteList from '../NoteList/NoteList'
 import SearchBox from '../SearchBox/SearchBox'
-import { fetchNotes, createNote, deleteNote } from '../services/noteService'
+import { fetchNotes, createNote, deleteNote } from '../../services/noteService'
 import css from './App.module.css'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import Pagination from '../Pagination/Pagination'
